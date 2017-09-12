@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zara.zio.qnaMapper">
+	<insert id="QnA_inset">
+
+	</insert>
+	<update id="travel_inMemo">
+		update travel_list set travel_in = 1
+		where travel_Code = #{travel_Code}
+	</update>
+	<select id="travel_inTitle" resultType="String">
+	<![CDATA[
+		select a.group_Code from travel_group a, group_application b
+		where date_format(now(), '%Y-%m-%d') >= a.start_Date
+		and date_format(now(), '%Y-%m-%d') <= a.end_Date
+		and a.group_Code = b.group_Code
+		and b.invite_user = #{user_id}
+		Limit 0, 1;
+	]]>
+	</select>
+	<select id="treavel_memo" resultType="travelpush">
+	<![CDATA[
+		select a.travel_Memo, a.travel_in, a.travel_code
+		from travel_list a, place_tbl c
+		where a.place_code = c.place_code and
+		a.group_code = #{group_code} and
+		(6371*acos(cos(radians(#{latitude}))*cos(radians(place_lat))*cos(radians(place_lng)
+		-radians(#{longitude}))+sin(radians(#{latitude}))*sin(radians(place_lat))))
+		<= 0.55
+	]]>
+	</select>
+	<select id="boardserch" resultType="int">
+	<![CDATA[
+		SELECT ifnull(max(board_code),-1) as board_code
+		FROM board
+		where user_id =#{user_id} and board_type_code between (1 and 3) and
+		(6371*acos(cos(radians(#{latitude}))*cos(radians(log_latitude))*cos(radians(log_longtitude)
+		-radians(#{longitude}))+sin(radians(#{latitude}))*sin(radians(log_latitude)))) <= 0.55
+		ORDER BY board_date
+		LIMIT 0,1
+		]]>
+	</select>
+	<select id="placeset" resultType="boardDTO">
+		select place_in, board_content
+		from board
+		where board_code = #{board_code}
+	</select>
+	<select id="selectQna" resultType="QnaBean">
+		select question_content
+		from
+		question
+		where question_type = #{log_text}
+	</select>
+	<update id="placeon">
+		update board set place_in = 1
+		where board_code =
+		#{board_code}
+	</update>
+	<update id="placeoff">
+		update board set place_in = 0
+		where user_id =
+		#{user_id}
+	</update>
+	<select id="selectQnaDefault" resultType="QnaBean">
+		select question_content
+		from question
+		where question_type = 'default'
+	</select>
+</mapper>

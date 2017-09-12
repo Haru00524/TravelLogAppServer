@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel.android.StepMapper">
+  	<insert id="step_insert">
+  		insert into board (user_id, board_type_code) value(#{user_id}, 3)
+  	</insert>
+  	<select id="user_step" resultType="int">
+  		select max(board_code)
+  		from board
+  		where user_id = #{user_id} and board_type_Code = 3
+  	</select>
+  	<update id="update_step">
+  		update board set board_title = #{board_title}, share_type = #{share_type}, step_log_code = #{board_code}
+  		where board_code = #{board_code} and board_type_code = 3
+  	</update>
+  	<delete id="delete_step">
+  		delete from board where board_code = #{step_code}
+  	</delete>
+  	<delete id="delete_Log_step">
+  		delete from board where step_log_code = #{step_code}
+  	</delete>
+  	<select id="step_log_select" resultType="boardLIstDTO">
+  		select * from board
+		where step_log_code = #{step_log_code} and board_code != #{step_log_code}
+  	</select>
+</mapper>

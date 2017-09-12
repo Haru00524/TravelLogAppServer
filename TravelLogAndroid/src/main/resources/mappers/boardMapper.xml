@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel.android.boardMapper">
+	<insert id="Log_inset">
+		insert into board(board_code, board_title,
+		board_content, log_longtitude,
+		log_latitude, share_type,
+		board_type_code, user_id, randomViewY,
+		step_log_code, write_type,
+		qna_in_test)
+		values (#{board_code},
+		#{board_title},#{board_content},#{log_longtitude},#{log_latitude},#{share_type},#{board_type_code},#{user_id},
+		#{randomViewY}, #{step_log_code}, #{write_type}, #{qna_in_test})
+	</insert>
+	<insert id="hash_Tag_insert">
+		insert into hash_tag(board_code, hash_tag_content)
+		values (#{board_code}, #{hash_tag_content})
+	</insert>
+	<insert id="attachecFile">
+		insert into attached_file(board_code, file_content,
+		file_type)
+		value (#{board_code}, #{file_content}, #{file_type})
+	</insert>
+	<select id="max_board_code" resultType="int">
+		select max(board_code)
+		from board;
+	</select>
+	<select id="share_Log_List" resultType="boardLIstDTO">
+		select a.*,
+		c.user_profile
+		from board a, user_info c
+		where share_type = 1 and
+		(a.board_type_code = 1 or a.board_type_code = 3) and
+		step_log_code = 0 and a.board_title != "0"
+		and a.user_id =
+		c.user_id
+		group by board_code
+		ORDER BY board_date DESC;
+	</select>
+	<select id="share_Log_main_List" resultType="boardLIstDTO">
+		select distinct a.*,
+		b.file_type, b.file_content, c.user_profile
+		from friend_list d,
+		user_info c, board a
+		LEFT OUTER JOIN attached_file b
+		ON a.board_Code =
+		b.board_Code
+		where (d.user_id = #{main_user_id} or d.friend_id =
+		#{main_user_id}) and
+		(a.user_id = d.user_id or a.user_id = d.friend_id)
+		and
+		(a.board_type_code = 1 or a.board_type_code = 3) and
+		a.share_type =
+		1 and
+		a.user_id !=
+		#{main_user_id} and d.friend_accept =1 and
+		(step_log_code
+		= 0 or
+		board_type_code =3) and a.board_title != "0"
+		and a.user_id = c.user_id
+		group by board_code
+		ORDER
+		BY board_date DESC;
+	</select>
+	<select id="share_Log_all_List" resultType="boardLIstDTO">
+		select a.*,
+		b.file_type, b.file_content, c.user_profile
+		from user_info c ,board a
+		LEFT OUTER JOIN attached_file b
+		ON a.board_code = b.board_code
+		where
+		a.share_type = 1 and (step_log_code = 0 or board_type_code =3) and
+		(a.board_type_code = 1 or a.board_type_code = 3) and a.board_title != "0"
+		and a.user_id =
+		c.user_id
+		group by
+		board_code
+		ORDER BY board_date DESC;
+
+	</select>
+	<select id="share_Log_search_List" resultType="boardLIstDTO">
+		select a.*,
+		b.file_type, b.file_content, e.user_profile
+		from hash_tag c, user_info
+		e, board a
+		LEFT OUTER JOIN attached_file b
+		ON a.board_code =
+		b.board_code
+		where a.share_type = 1 and c.board_code = a.board_code and
+		(a.board_type_code = 1 or a.board_type_code = 3)
+		and c.hash_tag_content
+		LIKE
+		CONCAT('%',#{hash_tag},'%') and
+		(step_log_code = 0 or
+		board_type_code
+		=3)
+		and a.user_id = e.user_id and a.board_title != "0"
+		group by board_code
+		ORDER BY
+		board_date
+		DESC;
+	</select>
+	<select id="share_Log_hash_List" resultType="boardLIstDTO">
+		SELECT a.*,
+		c.user_profile
+		FROM board a, hash_tag b, user_info c
+		WHERE a.board_code = b.board_code and
+		b.hash_tag_content LIKE CONCAT('%',#{hash_tag},'%') and
+		a.share_type = 1 and
+		(a.board_type_code = 1 or a.board_type_code = 3)
+		and a.user_id =
+		c.user_id and a.board_title != "0"
+		group by
+		board_code
+		ORDER BY board_date DESC;
+	</select>
+	<select id="share_Log_like_List" resultType="boardLIstDTO">
+		select *,
+		c.user_profile
+		from board, user_info c
+		where share_type = 1 and
+		(a.board_type_code = 1 or a.board_type_code = 3)
+		and (step_log_code = 0 or board_type_code =3)
+		and a.user_id = c.user_id and a.board_title != "0"
+		group by board_code
+		ORDER
+		BY like DESC;
+	</select>
+	<select id="share_Log_Like_hash_List" resultType="boardLIstDTO">
+		SELECT a.*,
+		c.user_profile
+		FROM board a,hash_tag b, user_info c
+		WHERE a.board_code =
+		b.board_code and
+		(a.board_type_code = 1 or a.board_type_code = 3)
+		and
+		b.hash_tag_content LIKE
+		CONCAT('%',#{hash_tag},'%') and
+		a.share_type = 1 and a.board_title != "0"
+		and (step_log_code = 0
+		or board_type_code =3)
+		and a.user_id = c.user_id
+		group by board_code
+		ORDER BY like DESC;
+	</select>
+	<select id="addFile" resultType="addachedFileDTO">
+		select *
+		from attached_file
+		where
+		board_code = #{board_code}
+	</select>
+	<insert id="likeInsert">
+		insert into board_like(user_id, board_code)
+		values
+		(#{user_id}, #{board_code})
+	</insert>
+	<insert id="CommentInsert">
+		insert into board(board_title, board_content,
+		board_type_code, user_id,
+		write_type, reply_code)
+		values
+		(#{board_title}, #{board_content}, #{board_type_code}, #{user_id},
+		#{write_type}, #{reply_code})
+	</insert>
+	<delete id="likedelete">
+		delete from board_like where user_id = #{user_id} and
+		board_code =
+		#{board_code}
+	</delete>
+	<select id="liketrue" resultType="int">
+		<![CDATA[
+		select ifnull(max(board_code),-1) as board_code
+		from board_like
+		where user_id = #{user_id} and board_code = #{board_code}
+		]]>
+	</select>
+	<select id="replyList" resultType="boardDTO">
+		select a.*, c.user_profile
+		from board a, user_info c
+		where reply_code = #{reply_code} and
+		a.user_id = c.user_id
+	</select>
+	<delete id="log_delete">
+		delete from board where user_id = #{user_id} and
+		board_code = #{board_code}
+	</delete>
+	<delete id="deleteHashtag">
+		delete from hash_tag where board_code = #{board_code}
+	</delete>
+	<update id="update_board">
+		update board set board_title = #{board_title},
+		board_content = #{board_content}, share_type = #{share_type}
+		where
+		board_code = #{board_code}
+	</update>
+	<delete id="deleteFile">
+		delete from attached_file where board_code =
+		#{board_code}
+	</delete>
+	<select id="hashTageList" resultType="hashTagDTO">
+		select hash_tag_content
+		from hash_tag
+		where board_code = #{board_code}
+	</select>
+	<select id="myLogs" resultType="boardLIstDTO">
+		select distinct a.*, b.file_type,
+		b.file_content
+		from board a
+		LEFT OUTER JOIN attached_file b
+		ON
+		a.board_Code = b.board_Code
+		where(a.board_type_code between 1 and 3)
+		and
+		(a.board_type_code = 1 or a.board_type_code = 3) and a.user_id =
+		#{user_id} and a.board_title != '0' and
+		(step_log_code = 0 or board_type_code =3)
+		group by
+		board_code
+		ORDER BY board_date DESC;
+	</select>
+	<select id="board_count" resultType="int">
+		select count(*)
+		from board
+		where user_id = #{user_id}
+	</select>
+	<select id="friend_count" resultType="int">
+		select count(*)
+		from
+		friend_list
+		where (user_id = #{user_id} or friend_id = #{user_id})
+	</select>
+	<select id="MyLikeBoard" resultType="boardLIstDTO">
+		SELECT a.*, c.file_type,
+		c.file_content
+		FROM board_like b ,board a
+		LEFT OUTER JOIN attached_file
+		c
+		ON a.board_code = c.board_code
+		where a.board_code = b.board_code and
+		b.user_id = #{user_id}
+	</select>
+	<select id="pushBoard" resultType="boardLIstDTO">
+		SELECT a.*, c.file_type,
+		c.file_content
+		FROM board a
+		LEFT OUTER JOIN attached_file c
+		ON
+		a.board_code = c.board_code
+		where a.board_code = #{board_code}
+	</select>
+	<select id="selectboard" resultType="selectTravel">
+		select a.group_Code, b.start_Date, b.end_Date from group_application a,
+		travel_group b
+		where user_id = #{user_id} and a.group_Code = b.group_Code;
+	</select>
+
+</mapper>

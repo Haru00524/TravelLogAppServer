@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel.android.TravelStoryMapper">
+	<insert id="expenseInsert">
+		insert into income_disbursement_tbl (expense_Content,
+		expense_Cost)
+		values(#{expense_Content}, #{expense_Cost})
+	</insert>
+	<select id="fineMaxExpenseCode" resultType="int">
+		select
+		MAX(expense_Code)
+		from income_disbursement_tbl
+	</select>
+	<insert id="expenseInsertTravel">
+		insert into write_travel (group_Code, user_id,
+		expense_Code) values
+		(#{group_Code}, #{user_id}, #{expense_Code})
+	</insert>
+	<select id="titleSearch" resultType="TravelStory">
+		select tg.group_Code
+		group_Code, tg.travel_Title travel_Title, tg.start_Date
+		start_Date,
+		tg.end_Date end_Date
+		from travel_group tg, group_application ga
+		where
+		tg.group_Code = ga.group_Code
+		AND ga.group_apply = 1 AND
+		ga.user_id=#{user_id}
+	</select>
+	<select id="DivisionSearch" resultType="TravelStory">
+		select coin_Limit,
+		sc_Division
+		from travel_group
+		where group_Code=#{group_Code}
+	</select>
+	<select id="selectExpense" resultType="TravelStory">
+		select wt.user_id user_id,
+		idt.expense_Content expense_Content,
+		idt.expense_Cost expense_Cost,
+		idt.expense_Date expense_Date
+		from write_travel wt,
+		income_disbursement_tbl idt
+		where idt.expense_Code = wt.expense_Code
+		AND wt.group_Code = #{group_Code}
+	</select>
+	<select id="travel_place_list" resultType="travelList">
+		SELECT
+		c.group_Code,a.*, b.place_img, c.travel_Priority, c.travel_Date, c.travel_Memo FROM
+		travel_list c, place_tbl a
+		LEFT OUTER join pimg_tbl b
+		on a.place_code =
+		b.place_code
+		where b.img_code = 0 and (c.place_code = a.place_code and
+		c.place_code =
+		b.place_code) and c.group_Code = #{group_Code}
+		order by
+		c.travel_Date, c.travel_Priority;
+	</select>
+	<select id="travel_date" resultType="TravelStory">
+		SELECT start_Date, end_Date
+		FROM zarazio.travel_group
+		where group_Code = #{group_Code};
+	</select>
+	<select id="travel_groupList" resultType="Travelgorup">
+		SELECT a.user_id,
+		a.group_apply, b.user_profile FROM group_application a, user_info b
+		where a.user_id = b.user_id and a.group_Code = #{group_Code};
+	</select>
+	<select id="travel_material_check" resultType="material">
+		SELECT b.*,
+		a.AppMaterial_check FROM
+		material_check a, material b
+		where
+		a.material_code = b.material_code
+		and a.group_Code = #{group_Code};
+	</select>
+	<update id="material_check_on">
+		update material_check set Appmaterial_check = 1
+		where
+		(material_code = #{material_code}) and (group_Code = #{group_code});
+	</update>
+	<update id="material_check_off">
+		update material_check set Appmaterial_check = 0
+		where
+		(material_code = #{material_code}) and (group_Code = #{group_code});
+	</update>
+	<select id="Travel_board" resultType="boardLIstDTO">
+		select a.*, b.file_type, b.file_content from board a left outer join
+		attached_file b
+		on a.board_code = b.board_code
+		where group_Code = #{group_Code} and board_type_code =2 and ((share_type between 1 and 2) or a.user_id = #{user_id})
+		order by a.board_date;
+	</select>
+</mapper>

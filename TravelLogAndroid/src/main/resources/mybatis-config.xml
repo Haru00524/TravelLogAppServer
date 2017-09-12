@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="Member" type="zarazio.travel.android.bean.Member" />
+		<typeAlias alias="boardDTO" type="zarazio.travel.android.bean.boardDTO" />
+		<typeAlias alias="boardLIstDTO" type="zarazio.travel.android.bean.boardLIstDTO" />
+		<typeAlias alias="addachedFileDTO" type="zarazio.travel.android.bean.attachedFileDTO" />
+		<typeAlias alias="steplogDTO" type="zarazio.travel.android.bean.StepLogDTO" />
+		<typeAlias alias="TravelStory" type="zarazio.travel.android.bean.TravelStory" />
+		<typeAlias alias="QnaBean" type="zarazio.travel.android.bean.QnaBean" />
+		<typeAlias alias="hashTagDTO" type="zarazio.travel.android.bean.hashTagDTO" />
+		<typeAlias alias="friend" type="zarazio.travel.android.bean.Friend" />
+		<typeAlias alias="travelList" type="zarazio.travel.android.bean.TravelPlace" />
+		<typeAlias alias="Travelgorup" type="zarazio.travel.android.bean.TravelGroup" />
+		<typeAlias alias="material" type="zarazio.travel.android.bean.Material" />
+		<typeAlias alias="selectTravel" type="zarazio.travel.android.bean.selectTravel" />
+		<typeAlias alias="travelpush" type="zarazio.travel.android.bean.TravelMemoPushData" />
+		<typeAlias alias="String" type="java.lang.String" />
+	</typeAliases>
+</configuration>
